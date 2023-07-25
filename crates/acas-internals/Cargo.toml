@@ -1,0 +1,15 @@
+[package]
+name = "acas-internals"
+version = "0.1.0"
+edition = "2021"
+description = "Internal functions and typedefs for acas"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+acas-stitch = ["dep:acas-stitch", "dep:image"]
+acas-core = []
+
+[dependencies]
+acas-core = { path = '../acas-core'}
+acas-stitch = { path = '../acas-stitch', optional = true}
+image = { image = "0.24.6", optional = true }

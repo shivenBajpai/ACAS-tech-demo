@@ -1,0 +1,55 @@
+[package]
+name = "acas"
+version = "0.1.0"
+authors = ["Shiven Bajpai <shiven.bajpai@gmail.com>"]
+edition = "2021"
+categories = ["graphics", "command-line-utilities", "game-development",  "multimedia::images"]
+description = "A sprite management tool that simplifies game development"
+exclude = []
+keywords = ["game", "acas", "gamedev", "graphics", "benimator"]
+license-file = "LICENSE.txt"
+readme = "README.md"
+repository = "https://github.com/shivenBajpai/acas"
+rust-version = "1.56"
+
+[workspace]
+members = [
+    "crates/*"
+]
+
+[features]
+default = [
+    "acas-core",
+    "acas-compose",
+    "acas-stitch"
+]
+
+acas-stitch = ["dep:image","acas-internals/acas-stitch"]
+acas-core = ["acas-internals/acas-core"]
+acas-compose = []
+
+[dev-dependencies]
+rotsprite = "0.1.4"
+sdl2 = "0.35.2"
+
+[dependencies]
+acas-internals = { path = "crates/acas-internals", optional = false }
+image = { image = "0.24.6", optional = true }
+
+[[example]]
+name = "sdl2-demo"
+path = "examples/sdl2/sdl2-demo/main.rs"
+
+[package.metadata.example.sdl2-demo]
+name = "Sdl2 Example"
+description = "A simple sdl2 demo showing acas' capabilites"
+required-features = ["core","acas-stitch"]
+
+[[example]]
+name = "test"
+path = "examples/testing/main.rs"
+
+[package.metadata.example.test]
+name = "Test example"
+description = "An Example I use to test my application on the fly"
+required-features = ["core","acas-stitch"]

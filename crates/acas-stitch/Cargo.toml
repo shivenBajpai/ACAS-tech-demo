@@ -1,0 +1,11 @@
+[package]
+name = "acas-stitch"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rotsprite = "0.1.4"
+image = '0.24.6'
+thiserror = '1.0.44'
