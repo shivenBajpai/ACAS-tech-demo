@@ -31,6 +31,7 @@ acas-compose = []
 [dev-dependencies]
 rotsprite = "0.1.4"
 sdl2 = "0.35.2"
+criterion = "0.5.1"
 
 [dependencies]
 acas-internals = { path = "crates/acas-internals", optional = false }
@@ -46,10 +47,14 @@ description = "A simple sdl2 demo showing acas' capabilites"
 required-features = ["core","acas-stitch"]
 
 [[example]]
-name = "test"
+name = "testing"
 path = "examples/testing/main.rs"
 
-[package.metadata.example.test]
+[package.metadata.example.testing]
 name = "Test example"
-description = "An Example I use to test my application on the fly"
+description = "An Example I use to test my application on the fly, not an actual example"
 required-features = ["core","acas-stitch"]
+
+[[bench]]
+name = "rotation_benchmark"
+harness = false
