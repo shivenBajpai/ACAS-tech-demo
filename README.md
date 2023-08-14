@@ -31,8 +31,9 @@ Provides Powerful image manipulation utilites tailored specifically to pixel art
 
 Bread and Butter of ACAS
 Library for handling animation states at runtime, Keeps track of what frame to display
-Additional data can tied to frame e.g iFrames for combat games, whether the current animation should lock the players ability to move e.g in Ultimate Move Animations, and any other custom flag you like
-Custom Events can also be tied to frames which will be processed by polling the Event Pump/ attaching Event Handlers. This can be used to e.g tie sfx to be in sync with your animations or simplify implmenting stat counters like "Number of Attacks used"
+Additional data can tied to frames and ACAS will keep track of these attributes for you e.g iFrames for combat games, whether the current animation locks the players ability to move like in Ultimate Move Animations, and any other custom flag you like. 
+
+Custom Events can also be tied to frames which will be processed by polling the Event Pump/ attaching Event Handlers. This can be used to for example, tie sfx to be in sync with your animations or simplify implmenting stat counters like "Number of Attacks used"
 
 ### ACAS Compose:
 ![Yet to Begin](https://img.shields.io/badge/Status-Yet%20To%20Begin-DE1047?style=plastic)
