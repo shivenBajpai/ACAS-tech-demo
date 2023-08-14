@@ -1,11 +1,14 @@
+/*
+ Compares Native Sprite Rotation function to that of common library for this purpose rotsprite 
+*/
 use criterion::{criterion_group, criterion_main, Criterion};
 use rotsprite::rotate::rotate;
 use acas::stitch;
 use image::{io::Reader, RgbaImage,Rgba};
 use std::f64::consts;
 
-fn test_native<P> (input_buffer: &[P], empty: &[P], width: u32, height: u32) where P: Clone {
-    let _ = stitch::rotate(input_buffer, empty, 4, width, height, consts::PI/4.0).unwrap();
+fn test_native<P> (input_buffer: &[P], empty: &[P], width: u32, height: u32) where P: Clone + std::fmt::Debug {
+    let _ = stitch::rotate(input_buffer, empty, 4, width as usize, height as usize, consts::PI/4.0).unwrap();
 }
 
 fn test_rotsprite<P> (input_buffer: &[P], empty: &P, width: usize, height: usize) where P: Clone + Eq {
@@ -18,7 +21,7 @@ fn benchmark_native(c: &mut Criterion) {
     let input_buffer = input_image.into_vec();
     let input_slice = input_buffer.as_slice();
 
-    c.bench_function("Acas Rotate spear", |b| b.iter(|| test_native(input_slice,&[0,0,0,0],width,height)));
+    c.bench_function("Acas Spear Rotation", |b| b.iter(|| test_native(input_slice,&[0,0,0,0],width,height)));
 }
 
 fn benchmark_foreign(c: &mut Criterion) {
@@ -32,7 +35,7 @@ fn benchmark_foreign(c: &mut Criterion) {
     let pixels: Vec<Rgba<u8>> = image.pixels().copied().collect();
     let unfound_color = Rgba([0, 0, 0, 0]);
 
-    c.bench_function("Rotsprite Rotate spear", |b| b.iter(|| test_rotsprite(&pixels,&unfound_color,width,height)));
+    c.bench_function("Rotsprite Spear Rotation", |b| b.iter(|| test_rotsprite(&pixels,&unfound_color,width,height)));
 }
 
 criterion_group!{
