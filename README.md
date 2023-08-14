@@ -21,7 +21,7 @@ Provides Powerful image manipulation utilites tailored specifically to pixel art
 <details>
   <summary><b style="color:#1077DE">Example</b></summary>
   
-  <img src="./readme_assets/Stitch_Demo.png">
+  ![Example Image](https://media.discordapp.net/attachments/747327260985524385/1140674558161068133/Stitch_Demo.png?width=514&height=671)
 </details>
 
 ### ACAS Core:
