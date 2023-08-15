@@ -8,7 +8,7 @@ In the future, an SDL2 based example will be included in the examples showing of
 
 ## Components of ACAS:
 
-### ACAS Stitch:
+### 🧵 ACAS Stitch:
 ![Being Polished](https://img.shields.io/badge/Status-Being%20Polished-1077DE?style=plastic)
 
 > Cargo Feature Name: `acas-stitch`
@@ -24,7 +24,7 @@ Provides Powerful image manipulation utilites tailored specifically to pixel art
   ![Example Image](https://media.discordapp.net/attachments/747327260985524385/1140674558161068133/Stitch_Demo.png?width=514&height=671)
 </details>
 
-### ACAS Core:
+### ⚙️ ACAS Core:
 ![Yet to Begin](https://img.shields.io/badge/Status-Yet%20To%20Begin-DE1047?style=plastic)
 
 > Cargo Feature Name: `acas-core`
@@ -35,7 +35,7 @@ Additional data can tied to frames and ACAS will keep track of these attributes 
 
 Custom Events can also be tied to frames which will be processed by polling the Event Pump/ attaching Event Handlers. This can be used to for example, tie sfx to be in sync with your animations or simplify implmenting stat counters like "Number of Attacks used"
 
-### ACAS Compose:
+### 📝 ACAS Compose:
 ![Yet to Begin](https://img.shields.io/badge/Status-Yet%20To%20Begin-DE1047?style=plastic)
 
 > Cargo Feature Name: `acas-compose`
