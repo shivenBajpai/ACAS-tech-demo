@@ -24,18 +24,24 @@ default = [
     "acas-stitch"
 ]
 
-acas-stitch = ["dep:image","acas-internals/acas-stitch"]
+acas-stitch = ["acas-internals/acas-stitch"]
 acas-core = ["acas-internals/acas-core"]
 acas-compose = []
 
 [dev-dependencies]
+# For comparison and benchmarks
 rotsprite = "0.1.4"
-sdl2 = "0.35.2"
 criterion = "0.5.1"
+# For Use in Examples
+image = {workspace = true}
+sdl2 = "0.35.2"
 
 [dependencies]
 acas-internals = { path = "crates/acas-internals", optional = false }
-image = { image = "0.24.6", optional = true }
+
+[workspace.dependencies]
+image = { version = "0.24.6" }
+thiserror = { version = '1.0.44'}
 
 [[example]]
 name = "sdl2-demo"

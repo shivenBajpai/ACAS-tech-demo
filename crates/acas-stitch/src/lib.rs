@@ -2,72 +2,122 @@ use std::collections::HashMap;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
-pub enum StitchingError {
+/// The Types of Errors that can occur when reading a buffer in rotation/stitching actions
+pub enum ParsingError {
     #[error("Buffer is empty")]
+    /// The image buffer passed contains no data
     EmptyBufferError,
     #[error("Buffer is incomplete")]
+    /// The length image buffer passed does not match the dimensions given. 
+    /// 
+    /// length of buffer != width\*height\*channels
     BufferSizeMismatch
 }
 
+/// The Ordering for which image ends up on top
 pub enum StitchingOrder {
+    /// Keep the "source" (unrotated image) on top
     SourceOnTop,
+    /// Keep the appendage (rotated image) on top
     AppendageOnTop
 }
 
+/// Determines the Algorithm used for rotation before stitching
 pub enum StitchingQuality {
+    /// Equivalent to fast_rotate()
     Fast,
+    /// Equivalent to fancy_rotate()
     Fancy
 }
 
-pub trait UnsignedInt {
+/// A Trait that designates valid subpixel types for stitching operations
+/// 
+/// Already Implemented for all unsigned ints
+pub trait StitchableType: Clone + Copy + TryFrom<i32> {
+    /// Returns The Maximum value of this type
     fn maxvalue() -> Self;
 }
 
-impl UnsignedInt for u8 {
+impl StitchableType for u8 {
     fn maxvalue() -> u8 {
         std::u8::MAX
     }
 }   
 
-impl UnsignedInt for u16 {
+impl StitchableType for u16 {
     fn maxvalue() -> u16 {
         std::u16::MAX
     }
 }   
 
-impl UnsignedInt for u32 {
+impl StitchableType for u32 {
     fn maxvalue() -> u32 {
         std::u32::MAX
     }
 }   
 
-impl UnsignedInt for u64 {
+impl StitchableType for u64 {
     fn maxvalue() -> u64 {
         std::u64::MAX
     }
 }
 
-pub type StitchingResult<T> = Result<(usize,usize,Vec<T>),StitchingError>;
+impl StitchableType for u128 {
+    fn maxvalue() -> u128 {
+        std::u128::MAX
+    }
+}
 
+/// (Width, Height, Image buffer) or ParsingError
+pub type StitchingResult<T> = Result<(usize,usize,Vec<T>),ParsingError>;
+
+/// Rotates an image using the fancy algorithm.
+/// Wont introduce any new colors as there is no color interpolation 
+/// 
+/// # Arguments
+/// 
+/// - buf - The image
+/// - width, height - Dimensions of image
+/// - channels - No. of channels per pixel
+/// - empty - Empty space will be filled with this value
+/// - angle - The angle of rotation (in radians), 
+///   - positive => Anticlockwise, 
+///   - negative => Clockwise
+/// 
+/// use fast_rotate() for faster rotation
 pub fn fancy_rotate<T: Clone + std::fmt::Debug>(buf: &[T], empty: &[T], channels: usize, width: usize, height: usize, angle: f64) -> StitchingResult<T> where [T]: Eq + std::hash::Hash{
     
     let image2x = upscale(&buf, channels, width, height);
     let image4x = upscale(&image2x.2.as_slice(), channels,image2x.0, image2x.1);
     let image8x = upscale(&image4x.2.as_slice(), channels,image4x.0, image4x.1);
 
-    let image_rotated = rotate(image8x.2.as_slice(), empty, channels, image8x.0, image8x.1, angle)?;
+    let image_rotated = fast_rotate(image8x.2.as_slice(), empty, channels, image8x.0, image8x.1, angle)?;
 
     let downscaled = downscale(image_rotated.2.as_slice(), channels, image_rotated.0, image_rotated.1, 8);
 
     Ok(downscaled)
 }
 
-pub fn rotate<T: Clone + std::fmt::Debug>(buf: &[T], empty: &[T], channels: usize, width: usize, height: usize, angle: f64) -> StitchingResult<T> {
+/// Rotates an image using the fast algorithm, result may be noisy for low resolution images. 
+/// Wont introduce any new colors as there is no color interpolation 
+/// 
+/// # Arguments
+/// 
+/// - buf - The image
+/// - width, height - Dimensions of image
+/// - channels - No. of channels per pixel
+/// - empty - Empty space will be filled with this value
+/// - angle - The angle of rotation (in radians), 
+///   - positive => Anticlockwise, 
+///   - negative => Clockwise
+/// 
+/// use fancy_rotate() for higher quality rotation
+pub fn fast_rotate<T: Clone + std::fmt::Debug>(buf: &[T], empty: &[T], channels: usize, width: usize, height: usize, angle: f64) -> StitchingResult<T> {
     if buf.is_empty() {
-        return Err(StitchingError::EmptyBufferError)
+        return Err(ParsingError::EmptyBufferError)
     }
     if buf.len() != width*height*channels {
-        return Err(StitchingError::BufferSizeMismatch)
+        return Err(ParsingError::BufferSizeMismatch)
     }
 
     let sin = angle.sin();
@@ -135,14 +185,14 @@ pub fn rotate<T: Clone + std::fmt::Debug>(buf: &[T], empty: &[T], channels: usiz
 /// - empty - Equivalent of empty pixel
 /// - channels - No. of channels per pixel
 pub fn stitch<T>(src: &[T], appendage: &[T], empty: &[T], channels: usize, src_dimensions: (usize,usize), src_anchor: (usize,usize), src_angle: f64, appendage_dimensions: (usize,usize), appendage_anchor: (usize,usize), appendage_angle: f64, top: StitchingOrder, quality: StitchingQuality) -> StitchingResult<T> 
-where T: Clone + Copy + TryFrom<i32> + UnsignedInt + std::fmt::Debug, f32: From<T>, [T]: Eq + std::hash::Hash
+where T: StitchableType + std::fmt::Debug, f32: From<T>, [T]: Eq + std::hash::Hash
 {
     let rotation = src_angle - appendage_angle;
 
     let rotated = {
         match quality {
             StitchingQuality::Fancy => fancy_rotate(appendage, empty, channels, appendage_dimensions.0, appendage_dimensions.1, rotation)?,
-            StitchingQuality::Fast => rotate(appendage, empty, channels, appendage_dimensions.0, appendage_dimensions.1, rotation)?
+            StitchingQuality::Fast => fast_rotate(appendage, empty, channels, appendage_dimensions.0, appendage_dimensions.1, rotation)?
         }
     };
     let rotated_anchor_pos = rotate_point(appendage_anchor, appendage_dimensions.0, appendage_dimensions.1, rotation);
@@ -250,7 +300,7 @@ fn rotate_point(point: (usize,usize), width: usize, height: usize, angle: f64) -
 }
 
 fn blend<T>(top: &[T], bottom: &[T]) -> Vec<T>
-where T: Copy + Clone + TryFrom<i32> + UnsignedInt, f32: From<T>
+where T: Copy + Clone + TryFrom<i32> + StitchableType, f32: From<T>
 {
     let alpha= f32::from(top.last().expect("Pixel cannot have 0 channels").clone())/f32::from(T::maxvalue());
     let alphacomp = 1.0-alpha;

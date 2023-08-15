@@ -8,7 +8,7 @@ use image::{io::Reader, RgbaImage,Rgba};
 use std::f64::consts;
 
 fn test_native<P> (input_buffer: &[P], empty: &[P], width: u32, height: u32) where P: Clone + std::fmt::Debug {
-    let _ = stitch::rotate(input_buffer, empty, 4, width as usize, height as usize, consts::PI/4.0).unwrap();
+    let _ = stitch::fast_rotate(input_buffer, empty, 4, width as usize, height as usize, consts::PI/4.0).unwrap();
 }
 
 fn test_rotsprite<P> (input_buffer: &[P], empty: &P, width: usize, height: usize) where P: Clone + Eq {
